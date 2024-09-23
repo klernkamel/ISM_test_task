@@ -1,0 +1,18 @@
+{
+  "" : {
+    "diagnostics" : "/Users/macbook/codes/dart/ISM/ism_test/build/macos/Build/Intermediates.noindex/Pods.build/Debug/flutter_localization.build/Objects-normal/arm64/flutter_localization-master.dia",
+    "emit-module-dependencies" : "/Users/macbook/codes/dart/ISM/ism_test/build/macos/Build/Intermediates.noindex/Pods.build/Debug/flutter_localization.build/Objects-normal/arm64/flutter_localization-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/macbook/codes/dart/ISM/ism_test/build/macos/Build/Intermediates.noindex/Pods.build/Debug/flutter_localization.build/Objects-normal/arm64/flutter_localization-master-emit-module.dia",
+    "swift-dependencies" : "/Users/macbook/codes/dart/ISM/ism_test/build/macos/Build/Intermediates.noindex/Pods.build/Debug/flutter_localization.build/Objects-normal/arm64/flutter_localization-master.swiftdeps"
+  },
+  "/Users/macbook/.pub-cache/hosted/pub.dev/flutter_localization-0.2.2/macos/Classes/FlutterLocalizationPlugin.swift" : {
+    "const-values" : "/Users/macbook/codes/dart/ISM/ism_test/build/macos/Build/Intermediates.noindex/Pods.build/Debug/flutter_localization.build/Objects-normal/arm64/FlutterLocalizationPlugin.swiftconstvalues",
+    "dependencies" : "/Users/macbook/codes/dart/ISM/ism_test/build/macos/Build/Intermediates.noindex/Pods.build/Debug/flutter_localization.build/Objects-normal/arm64/FlutterLocalizationPlugin.d",
+    "diagnostics" : "/Users/macbook/codes/dart/ISM/ism_test/build/macos/Build/Intermediates.noindex/Pods.build/Debug/flutter_localization.build/Objects-normal/arm64/FlutterLocalizationPlugin.dia",
+    "index-unit-output-path" : "/Pods.build/Debug/flutter_localization.build/Objects-normal/arm64/FlutterLocalizationPlugin.o",
+    "llvm-bc" : "/Users/macbook/codes/dart/ISM/ism_test/build/macos/Build/Intermediates.noindex/Pods.build/Debug/flutter_localization.build/Objects-normal/arm64/FlutterLocalizationPlugin.bc",
+    "object" : "/Users/macbook/codes/dart/ISM/ism_test/build/macos/Build/Intermediates.noindex/Pods.build/Debug/flutter_localization.build/Objects-normal/arm64/FlutterLocalizationPlugin.o",
+    "swift-dependencies" : "/Users/macbook/codes/dart/ISM/ism_test/build/macos/Build/Intermediates.noindex/Pods.build/Debug/flutter_localization.build/Objects-normal/arm64/FlutterLocalizationPlugin.swiftdeps",
+    "swiftmodule" : "/Users/macbook/codes/dart/ISM/ism_test/build/macos/Build/Intermediates.noindex/Pods.build/Debug/flutter_localization.build/Objects-normal/arm64/FlutterLocalizationPlugin~partial.swiftmodule"
+  }
+}
