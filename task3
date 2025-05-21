@@ -1,0 +1,16 @@
+    def backward_pass(self, X, y, y_pred, learning_rate=0.01):
+        """
+        Обновляет значения весов нейрона в соответствии с этим объектом
+        :param: X -- матрица входов размера (n, m)
+                y -- вектор правильных ответов размера (n, 1)
+                learning_rate - "скорость обучения" (символ alpha в формулах выше)
+        В этом методе ничего возвращать не нужно, только правильно поменять веса
+        с помощью градиентного спуска.
+        """
+        n = X.shape[0]
+        dz = (y_pred - y) * self.relu_derivative(self.forward_pass(X))
+        dw = (1 / n) * np.dot(X.T, dz)
+        db = (1 / n) * np.sum(dz)
+
+        self.w -= learning_rate * dw
+        self.b -= learning_rate * db
