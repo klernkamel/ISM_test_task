@@ -1,90 +1,93 @@
-import matplotlib.pyplot as plt
 import numpy as np
 
-import torch
+class MultilayerPerceptron:
+    def __init__(self, w=None, b=0):
+        self.w = w
+        self.b = b
 
-N = 100
-D = 2
-K = 3
-X = np.zeros((N * K, D))
-y = np.zeros(N * K, dtype='uint8')
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
 
-for j in range(K):
-    ix = range(N * j,N * (j + 1))
-    r = np.linspace(0.0, 1, N)
-    t = np.linspace(j * 4, (j + 1) * 4,N) + np.random.randn(N) * 0.2 # theta
-    X[ix] = np.c_[r * np.sin(t), r * np.cos(t)]
-    y[ix] = j
+    def sigmoid_derivative(self, sigmoid_x):
+        return sigmoid_x * (1 - sigmoid_x)
 
-X = torch.autograd.Variable(torch.FloatTensor(X))
-y = torch.autograd.Variable(torch.LongTensor(y.astype(np.int64)))
+    def activate(self, x):
+        return self.sigmoid(x)
 
-print(X.data.shape, y.data.shape)
+    def Loss(self, y_pred, y_true):
+        eps = 1e-8
+        return -np.mean(y_true * np.log(y_pred + eps) + (1 - y_true) * np.log(1 - y_pred + eps))
 
-# N - размер батча (batch_size, нужно для метода оптимизации);
-# D_in - размерность входа (количество признаков у объекта);
-# H - размерность скрытых слоёв;
-# D_out - размерность выходного слоя (суть - количество классов)
-N, D_in, H, D_out = 64, 2, 100, 3
+    def forward_pass(self, X):
+        self.z = np.dot(X, self.w) + self.b
+        self.a = self.activate(self.z)
+        return self.a
 
-# Use the nn package to define our model and loss function.
+    def backward_pass(self, X, y, y_pred, learning_rate=0.01):
+        n = X.shape[0]
+        dz = (y_pred - y)*self.sigmoid_derivative(self.forward_pass(X))
+        dw = (1 / n) * np.dot(X.T, dz)
+        db = (1 / n) * np.sum(dz)
 
-better_net = torch.nn.Sequential(
-    torch.nn.Linear(D_in, H),
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, H),
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, H),
-    torch.nn.ReLU(),
-    torch.nn.Linear(H, D_out),
-)
+        self.w -= learning_rate * dw
+        self.b -= learning_rate * db
 
-loss_fn = torch.nn.CrossEntropyLoss(size_average=False)
+    def fit(self, X, y, num_epochs=300, learning_rate=0.01):
 
-learning_rate = 1e-3
-optimizer = torch.optim.SGD(better_net.parameters(), lr=learning_rate)
-for t in range(1000):
-    # forward
-    y_pred = better_net(X)
+        loss_values = []
 
-    # loss
-    loss = loss_fn(y_pred, y)
-    #print('{} {}'.format(t, loss.data))
+        for i in range(num_epochs):
+            y_pred = self.forward_pass(X)
+            loss = self.Loss(y_pred, y)
+            loss_values.append(loss)
+            self.backward_pass(X, y, y_pred, learning_rate)
 
-    # зануляем градиенты (чтобы не было остатка с редыдущего шага)
-    optimizer.zero_grad()
+        return loss_values
 
-    # backward
-    loss.backward()
+    def predict(self, X):
+        y_pred = self.forward_pass(X)
+        return (y_pred >= 0.5).astype(int)
 
-    # обновляем
-    optimizer.step()
+X = data.iloc[:,:19].values  # матрица объекты-признаки
+print(X.shape[1])
+y = data['label'].values.reshape((-1, 1))  # классы (столбец из нулей и единиц)
+print(y.shape)
 
-X = X.data.numpy()
-y = y.data.numpy()
-
-h = 0.02
-x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
-y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-
-xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
-                     np.arange(y_min, y_max, h))
-grid_tensor = torch.FloatTensor(np.c_[xx.ravel(), yy.ravel()])
-
-Z = better_net(torch.autograd.Variable(grid_tensor))
-Z = Z.data.numpy()
-Z = np.argmax(Z, axis=1)
-Z = Z.reshape(xx.shape)
+neuron = MultilayerPerceptron(w=np.random.rand(X.shape[1], 1) * 0.01, b=np.random.rand(1) * 0.01)
+X = (X - X.mean(axis=0)) / X.std(axis=0)
+Loss_values = neuron.fit(X, y, num_epochs=1000)
 
 plt.figure(figsize=(10, 8))
+plt.plot(Loss_values)
+plt.title('Функция потерь', fontsize=15)
+plt.xlabel('номер итерации', fontsize=14)
+plt.ylabel('$Loss(\hat{y}, y)$', fontsize=14)
+plt.show()
+plt.figure(figsize=(10, 8))
+plt.scatter(data.iloc[:, 12], data.iloc[:, 8], c=neuron.predict(X), cmap='rainbow')
+plt.title('Голоса', fontsize=15)
+plt.xlabel('Частота', fontsize=14)
+plt.ylabel('sd', fontsize=14)
+plt.show()
 
-plt.contourf(xx, yy, Z, cmap=plt.cm.rainbow, alpha=0.3)
-plt.scatter(X[:, 0], X[:, 1], c=y, s=40, cmap=plt.cm.rainbow)
+import pandas as pd
+from sklearn.linear_model import Perceptron as skPerceptron
+from sklearn.metrics import accuracy_score
+data_path = './voice.csv'
+data = pd.read_csv(data_path)
+data['label'] = data['label'].apply(lambda x: 1 if x == 'male' else 0)
+data.head()
+data = data.sample(frac=1)
+X_train = data.iloc[:int(len(data)*0.7), :-1]  # матрица объекты-признаки
+y_train = data.iloc[:int(len(data)*0.7), -1]  # истинные значения пола (мужчина/женщина)
 
-plt.xlim(xx.min(), xx.max())
-plt.ylim(yy.min(), yy.max())
+X_test = data.iloc[int(len(data)*0.7):, :-1]  # матрица объекты-признаки
+y_test = data.iloc[int(len(data)*0.7):, -1]  # истинные значения пола (мужчина/женщина)
+RANDOM_SEED = 42
 
-plt.title('Спираль', fontsize=15)
-plt.xlabel('$x$', fontsize=14)
-plt.ylabel('$y$', fontsize=14)
-plt.show();
+sk_perceptron = skPerceptron(random_state=RANDOM_SEED)
+sk_perceptron.fit(X_train.values, y_train.values)
+print('Точность (доля правильных ответов) перцептрона из sklearn: {:.3f} %'.format(
+    accuracy_score(y_test.values, sk_perceptron.predict(X_test)) * 100))
+
+сделай сравнение и моей неиросети как с sklearn
