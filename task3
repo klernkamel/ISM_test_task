@@ -119,3 +119,4 @@ y_pred_sk = sk_perceptron.predict(X_test_scaled)
 accuracy_sk = accuracy_score(y_test_np.ravel(), y_pred_sk)
 
 print('Точность перцептрона из sklearn: {:.3f} %'.format(accuracy_sk * 100))
+https://github.com/artem-evko/laba5/blob/main/Lab5_convnet.ipynb
