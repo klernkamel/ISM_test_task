@@ -103,3 +103,11 @@ Cell In[35], line 1
       3 X_train_scaled = (X_train_np - X_train_np.mean(axis=0)) / X_train_np.std(axis=0)
 
 NameError: name 'X_train' is not defined
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# Делим данные: 70% — на обучение, 30% — на тест
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, shuffle=True
+)
