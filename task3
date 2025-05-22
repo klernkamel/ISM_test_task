@@ -111,3 +111,11 @@ from sklearn.metrics import accuracy_score
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=42, shuffle=True
 )
+from sklearn.linear_model import Perceptron
+
+sk_perceptron = Perceptron(random_state=42)
+sk_perceptron.fit(X_train_scaled, y_train_np.ravel())
+y_pred_sk = sk_perceptron.predict(X_test_scaled)
+accuracy_sk = accuracy_score(y_test_np.ravel(), y_pred_sk)
+
+print('Точность перцептрона из sklearn: {:.3f} %'.format(accuracy_sk * 100))
