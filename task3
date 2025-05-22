@@ -1,8 +1,81 @@
+import numpy as np
 
+class MultilayerPerceptron:
+    def __init__(self, w=None, b=0):
+        self.w = w
+        self.b = b
 
-from sklearn.metrics import accuracy_score
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
 
-# Стандартизация данных для твоей модели (не забудь применить те же параметры к X_test)
+    def sigmoid_derivative(self, sigmoid_x):
+        return sigmoid_x * (1 - sigmoid_x)
+
+    def activate(self, x):
+        return self.sigmoid(x)
+
+    def Loss(self, y_pred, y_true):
+        eps = 1e-8
+        return -np.mean(y_true * np.log(y_pred + eps) + (1 - y_true) * np.log(1 - y_pred + eps))
+
+    def forward_pass(self, X):
+        self.z = np.dot(X, self.w) + self.b
+        self.a = self.activate(self.z)
+        return self.a
+
+    def backward_pass(self, X, y, y_pred, learning_rate=0.01):
+        n = X.shape[0]
+        dz = (y_pred - y)*self.sigmoid_derivative(self.forward_pass(X))
+        dw = (1 / n) * np.dot(X.T, dz)
+        db = (1 / n) * np.sum(dz)
+
+        self.w -= learning_rate * dw
+        self.b -= learning_rate * db
+
+    def fit(self, X, y, num_epochs=300, learning_rate=0.01):
+
+        loss_values = []
+
+        for i in range(num_epochs):
+            y_pred = self.forward_pass(X)
+            loss = self.Loss(y_pred, y)
+            loss_values.append(loss)
+            self.backward_pass(X, y, y_pred, learning_rate)
+
+        return loss_values
+
+    def predict(self, X):
+        y_pred = self.forward_pass(X)
+        return (y_pred >= 0.5).astype(int)
+
+data = pd.read_csv("./voice.csv")
+data['label'] = (data['label'] == 'male').astype(float)
+plt.figure(figsize=(10, 8))
+plt.scatter(data.iloc[:, 12], data.iloc[:, 8], c=data['label'], cmap='rainbow')
+plt.title('Голоса', fontsize=15)
+plt.xlabel('Частота', fontsize=14)
+plt.ylabel('sd', fontsize=14)
+plt.show()
+X = data.iloc[:,:19].values  # матрица объекты-признаки
+print(X.shape[1])
+y = data['label'].values.reshape((-1, 1))  # классы (столбец из нулей и единиц)
+print(y.shape)
+neuron = MultilayerPerceptron(w=np.random.rand(X.shape[1], 1) * 0.01, b=np.random.rand(1) * 0.01)
+X = (X - X.mean(axis=0)) / X.std(axis=0)
+Loss_values = neuron.fit(X, y, num_epochs=1000)
+
+plt.figure(figsize=(10, 8))
+plt.plot(Loss_values)
+plt.title('Функция потерь', fontsize=15)
+plt.xlabel('номер итерации', fontsize=14)
+plt.ylabel('$Loss(\hat{y}, y)$', fontsize=14)
+plt.show()
+plt.figure(figsize=(10, 8))
+plt.scatter(data.iloc[:, 12], data.iloc[:, 8], c=neuron.predict(X), cmap='rainbow')
+plt.title('Голоса', fontsize=15)
+plt.xlabel('Частота', fontsize=14)
+plt.ylabel('sd', fontsize=14)
+plt.show()
 X_train_np = X_train.values
 X_test_np = X_test.values
 X_train_scaled = (X_train_np - X_train_np.mean(axis=0)) / X_train_np.std(axis=0)
@@ -22,3 +95,11 @@ y_pred_my = my_perceptron.predict(X_test_scaled)
 accuracy_my = accuracy_score(y_test_np, y_pred_my)
 
 print('Точность твоего перцептрона: {:.3f} %'.format(accuracy_my * 100))
+
+NameError                                 Traceback (most recent call last)
+Cell In[35], line 1
+----> 1 X_train_np = X_train.values
+      2 X_test_np = X_test.values
+      3 X_train_scaled = (X_train_np - X_train_np.mean(axis=0)) / X_train_np.std(axis=0)
+
+NameError: name 'X_train' is not defined
